@@ -15,5 +15,27 @@ import com.miguel.backend_login_page.domain.user.User;
 
 @Service
 public class TokenService {
+    @Value("${api.security.token.secret}")
+    private String secret;
 
+    public String generateToken(User user) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+
+            String token = JWT.create()
+                    .withIssuer("login-athu-api")
+                    .withSubject(user.getEmail())
+                    .withExpiresAt(this.generatexpiresDate())
+                    .sign(algorithm);
+            return token;
+        } catch (JWTCreationException exception) {
+            throw new RuntimeException("Error while authenticating");
+        }
+    }
+
+
+
+    private Instant generatexpiresDate() {
+        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+    }
 }
