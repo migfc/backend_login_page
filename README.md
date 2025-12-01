@@ -1,262 +1,130 @@
 # Backend Login Page 🔐
 
-[![CI/CD Pipeline](https://github.com/seu-usuario/backend_login_page/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/seu-usuario/backend_login_page/actions)
+[![CI/CD Pipeline](https://github.com/your-username/backend_login_page/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/your-username/backend_login_page/actions)
 [![Java](https://img.shields.io/badge/Java-21-orange?logo=java)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.7-brightgreen?logo=springboot)](https://spring.io/projects/spring-boot)
 [![Maven](https://img.shields.io/badge/Maven-3.9.6-C71A36?logo=apache-maven)](https://maven.apache.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://www.docker.com/)
 
-Um sistema de autenticação seguro e escalável construído com Spring Boot 3.5.7, JWT e Docker.
+A secure and extensible authentication microservice built with Spring Boot 3.5.7, JWT and Docker.
 
-## 📋 Sumário
+## Table of Contents
 
-- [Características](#-características)
-- [Pré-requisitos](#-pré-requisitos)
-- [Instalação](#-instalação)
-- [Configuração](#-configuração)
-- [Uso](#-uso)
-- [API Endpoints](#-api-endpoints)
-- [Testes](#-testes)
-- [Docker](#-docker)
-- [Arquitetura](#-arquitetura)
-- [Segurança](#-segurança)
-- [Contribuindo](#-contribuindo)
-- [Licença](#-licença)
+- Features
+- Requirements
+- Installation
+- Configuration
+- Usage
+- API Endpoints
+- Tests
+- Docker
+- Architecture
+- Security
+- Contributing
+- License
 
-## ✨ Características
+## Features
 
-### Autenticação & Segurança
-- ✅ Autenticação JWT (Auth0)
-- ✅ Criptografia de senhas com BCrypt
-- ✅ Validação de tokens automática
-- ✅ CORS configurável
-- ✅ CSRF desabilitado (API stateless)
+- JWT authentication and authorization
+- Password hashing with BCrypt
+- Spring Security integration
+- JPA + Hibernate persistence
+- In-memory H2 for tests and local development
+- Prepared for PostgreSQL (docker-compose)
+- Unit tests and CI pipeline
 
-### Qualidade de Código
-- ✅ 22 testes unitários (100% passando)
-- ✅ 100% cobertura de testes
-- ✅ Exceções personalizadas
-- ✅ Global Exception Handler
-- ✅ Padrão MVC bem definido
+## Requirements
 
-### Persistência
-- ✅ Spring Data JPA
-- ✅ Hibernate ORM
-- ✅ Banco de dados H2 (dev/test)
-- ✅ Pronto para PostgreSQL (prod)
+- Java 21+
+- Maven 3.9+
+- Docker (optional for containers)
 
-### DevOps
-- ✅ Docker & Docker Compose
-- ✅ GitHub Actions CI/CD
-- ✅ Multi-stage Docker build
-- ✅ Health checks automáticos
+## Quick Start (local)
 
-## 🔧 Pré-requisitos
+1. Clone the repository
 
-### Desenvolvimento Local
-- **Java**: 21+ ([Download](https://www.oracle.com/java/technologies/javase-jdk21-downloads.html))
-- **Maven**: 3.9.6+ ([Download](https://maven.apache.org/download.cgi))
-- **Git**: 2.0+ ([Download](https://git-scm.com/))
-
-### Com Docker
-- **Docker**: 20.10+ ([Download](https://www.docker.com/products/docker-desktop))
-- **Docker Compose**: 2.0+ (Incluído no Docker Desktop)
-
-### Verificar instalações
 ```bash
-java -version          # Java 21+
-mvn -version           # Maven 3.9.6+
-docker --version       # Docker 20.10+
-docker-compose --version # Docker Compose 2.0+
-```
-
-## 📦 Instalação
-
-### 1. Clonar o Repositório
-```bash
-git clone https://github.com/seu-usuario/backend_login_page.git
+git clone https://github.com/your-username/backend_login_page.git
 cd backend_login_page
 ```
 
-### 2. Instalar Dependências
+2. Build
+
 ```bash
-mvn clean install
+mvn clean package
 ```
 
-### 3. Executar a Aplicação
+3. Run (development)
 
-#### Modo Desenvolvimento
 ```bash
 mvn spring-boot:run
 ```
 
-A aplicação estará disponível em: `http://localhost:8080`
+Application will run on `http://localhost:8080`.
 
-#### Modo Produção
-```bash
-mvn clean package
-java -jar target/backend_login_page-0.0.1-SNAPSHOT.jar
-```
+### Using Docker Compose (Postgres)
 
-## ⚙️ Configuração
-
-### application.properties
-```properties
-# Server
-spring.application.name=backend_login_page
-server.port=8080
-
-# Database (H2 - Desenvolvimento)
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driver-class-name=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
-
-# JWT
-api.security.token.secret=ronaldo
-# ⚠️ IMPORTANTE: Alterar em produção!
-# Use variável de ambiente: API_SECURITY_TOKEN_SECRET
-```
-
-### Variáveis de Ambiente (Produção)
+1. Copy the example env file and update secrets:
 
 ```bash
-# JWT Secret (OBRIGATÓRIO em produção)
-export API_SECURITY_TOKEN_SECRET=sua-chave-secreta-muito-segura
-
-# Database (Se não for H2)
-export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/login_db
-export SPRING_DATASOURCE_USERNAME=postgres
-export SPRING_DATASOURCE_PASSWORD=senha
-
-# Server
-export SERVER_PORT=8080
+cp .env.example .env
+# edit .env and set secure values
 ```
 
-### Docker Environment
+2. Start services
+
 ```bash
-# .env.docker
-API_SECURITY_TOKEN_SECRET=sua-chave-super-secreta
-SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb
-SPRING_DATASOURCE_USERNAME=sa
-SPRING_DATASOURCE_PASSWORD=
+docker compose up -d
 ```
 
-## 🚀 Uso
+3. Stop services
 
-### Fluxo de Autenticação
-
-#### 1. Registrar Novo Usuário
 ```bash
-curl -X POST http://localhost:8080/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "João Silva",
-    "email": "joao@example.com",
-    "password": "senha123"
-  }'
+docker compose down
 ```
 
-**Resposta (200 OK):**
-```json
-{
-  "name": "João Silva",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
+## Configuration
 
-#### 2. Fazer Login
-```bash
-curl -X POST http://localhost:8080/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "joao@example.com",
-    "password": "senha123"
-  }'
-```
+Environment variables are used for secrets and database settings. See `.env.example`.
 
-**Resposta (200 OK):**
-```json
-{
-  "name": "João Silva",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
+Important variables:
 
-#### 3. Acessar Recurso Protegido
-```bash
-curl -X GET http://localhost:8080/user \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-```
+- `API_SECURITY_TOKEN_SECRET` - JWT secret
+- `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` - Postgres credentials
+- `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` - Spring datasource
 
-**Resposta (200 OK):**
-```
-Suceso
-```
+## API Endpoints
 
-## 📡 API Endpoints
+Authentication:
 
-### Autenticação (Públicos)
+- `POST /auth/register` - register a new user
+- `POST /auth/login` - login and receive a JWT token
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| `POST` | `/auth/register` | Registrar novo usuário |
-| `POST` | `/auth/login` | Fazer login |
+Protected resources (require `Authorization: Bearer <token>`):
 
-### Recursos (Protegidos)
+- `GET /user` - returns a simple protected resource
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| `GET` | `/user` | Obter informações do usuário |
+## Tests
 
-### Códigos de Resposta
+Run all tests:
 
-| Código | Significado |
-|--------|-------------|
-| `200` | Sucesso |
-| `400` | Requisição inválida |
-| `401` | Não autenticado / Credenciais inválidas |
-| `404` | Recurso não encontrado |
-| `409` | Conflito (ex: email já existe) |
-| `500` | Erro interno do servidor |
-
-### Estrutura de Erros
-
-Todos os erros seguem este padrão:
-
-```json
-{
-  "message": "User not found",
-  "error": "USER_NOT_FOUND",
-  "status": 404,
-  "timestamp": "2025-11-29T15:30:00"
-}
-```
-
-## 🧪 Testes
-
-### Executar Todos os Testes
 ```bash
 mvn test
 ```
 
-### Rodar Testes Específicos
+Run a single test class:
+
 ```bash
-# Apenas AuthControllerTest
-mvn test -Dtest=AuthControllerTest
-
-# Apenas TokenServiceTest
-mvn test -Dtest=TokenServiceTest
-
-# Com padrão
-mvn test -Dtest=*ServiceTest
+mvn -Dtest=AuthControllerTest test
 ```
 
-### Gerar Relatório de Cobertura
-```bash
-mvn clean test jacoco:report
-# Acesse: target/site/jacoco/index.html
-```
+## Contributing
+
+See `CONTRIBUTING.md` for contribution guidelines.
+
+## License
+
+This project uses a permissive license. See the `LICENSE` file if present.
 
 ### Cobertura de Testes
 
